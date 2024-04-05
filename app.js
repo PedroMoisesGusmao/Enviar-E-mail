@@ -17,8 +17,8 @@ server.post("/enviar-email", (req, res) => {
         to: req.body.destination,
         subject: "ID especial",
         text: `O seu id é: ${id}`,
-        onSucess: (i) => {console.log(i);}
     })
+    console.log(`ID: ${id}`);
     return res.status(201).json({status: 201, message: "E-mail enviado com sucesso.", id: id});
 });
 
