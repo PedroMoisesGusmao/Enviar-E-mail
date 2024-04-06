@@ -6,7 +6,14 @@ const server = express();
 
 server.use(express.json())
 
-server.post("/enviar-email", (req, res) => {
+function verificarBody(req, res, next) {
+    if (!req.body.destination) {
+        return res.status(400).json({error: "Ocorreu um erro, chave 'destination' não encontrada."});
+    }
+    return next();
+}
+
+server.post("/enviar-email", verificarBody, (req, res) => {
     const id = Math.floor(Math.random() * 10000);
     nodemailer.sendEmail({
         auth: {
@@ -17,9 +24,10 @@ server.post("/enviar-email", (req, res) => {
         to: req.body.destination,
         subject: "ID especial",
         text: `O seu id é: ${id}`,
-    })
-    console.log(`ID: ${id}`);
-    return res.status(201).json({status: 201, message: "E-mail enviado com sucesso.", id: id});
+        onSucess: console.log(`E-mail enviado com sucesso para ${req.body.destination}`),
+        onError: (e) => console.log(e)
+    });
+    return res.status(201).json({message: "E-mail enviado com sucesso.", id: id});
 });
 
 server.listen(8080);
